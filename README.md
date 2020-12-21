@@ -1,4 +1,4 @@
-# Program for transforming CSV data and generating SQL insert statements
+#Program for transforming CSV data and generating SQL insert statements
 
 
 ## Dependencies
