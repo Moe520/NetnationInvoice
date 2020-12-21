@@ -18,7 +18,7 @@ from skippable_row_dropper.strategy.drop_rows_invalid_item_count_strategy import
 
 # Strategies for transformation / mapping of columns
 from column_prepper.column_prepper import ColumnPrepper
-from column_prepper.strategy.prep_column_remove_hyphen_strategy import PrepColumnRemoveHyphensStrategy
+from column_prepper.strategy.prep_column_remove_non_alphanum_strategy import PrepColumnRemoveNonAlphaNumStrategy
 from column_prepper.strategy.prep_column_map_part_number_strategy import PrepColumnMapPartNumberStrategy
 from column_prepper.strategy.prep_column_apply_reduction_map_strategy import PrepColumnApplyReductionMapStrategy
 
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     show_snapshot_if_debugging("DF After Part number mapped",df,  DEBUG_MODE)
 
     # Clean the accountGuid column
-    account_guid_transformer = ColumnPrepper(PrepColumnRemoveHyphensStrategy)
+    account_guid_transformer = ColumnPrepper(PrepColumnRemoveNonAlphaNumStrategy)
     account_guid_transformer.prep_column(df, type_map, reduction_map)
 
     show_snapshot_if_debugging("DF After non alphanumerics in account guid removed",df,  DEBUG_MODE)

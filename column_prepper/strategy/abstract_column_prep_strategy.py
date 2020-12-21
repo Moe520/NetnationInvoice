@@ -2,6 +2,9 @@ from abc import ABCMeta, abstractmethod
 
 
 class ColumnPrepStrategy(object):
+    """
+     Will hold a strategy for transforming a column in place
+    """
     __metaclass__ = ABCMeta
 
     @abstractmethod
