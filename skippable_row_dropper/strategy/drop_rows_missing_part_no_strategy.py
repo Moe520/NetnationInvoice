@@ -7,4 +7,4 @@ class DropRowsMissingPartNoStrategy(DropRowsStrategy):
     def drop_bad_rows(self, data_ref, error_logger):
         indices_with_missing_part_no = data_ref.loc[pd.isna(data_ref['PartNumber'])].index
         error_logger.log_to_file_bulk(indices_with_missing_part_no, "Row Skipped due to missing part number: ")
-        data_ref.drop(data_ref[data_ref.PartnerID in self.BAD_PARTNER_ID_LIST], inplace=True)
+        data_ref.drop(indices_with_missing_part_no, inplace=True)

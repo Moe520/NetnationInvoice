@@ -10,6 +10,11 @@ from utils.input_validation_utils import get_terminal_args
 from skippable_row_dropper.skippable_row_dropper import SkippableRowDropper
 from skippable_row_dropper.strategy.drop_rows_missing_part_no_strategy import DropRowsMissingPartNoStrategy
 from skippable_row_dropper.strategy.drop_rows_by_partner_id_strategy import DropRowsByPartnerIdStrategy
+from skippable_row_dropper.strategy.drop_rows_invalid_item_count_strategy import DropRowsInvalidItemCountStrategy
+
+from column_prepper.column_prepper import ColumnPrepper
+from column_prepper.strategy.prep_column_remove_hyphen_strategy import PrepColumnRemoveHyphensStrategy
+from column_prepper.strategy.prep_column_map_part_number_strategy import PrepColumnMapPartNumberStrategy
 
 from error_logger.error_logger import ErrorLogger
 
@@ -97,12 +102,13 @@ if __name__ == "__main__":
     except ParserError:
         csv_error_logger.critical_error(csv_file_path, 'Is not a valid csv file')
 
-    ####################################################################
-    # Find invalid rows in the CSV and log them                        #
-    ####################################################################
+    ###############################################################################
+    # Find invalid rows in the CSV, log them then drop them                       #
+    ###############################################################################
 
     partner_id_row_dropper = SkippableRowDropper(DropRowsByPartnerIdStrategy)
     missing_part_number_row_dropper = SkippableRowDropper(DropRowsMissingPartNoStrategy)
+    bad_item_count_dropper = SkippableRowDropper(DropRowsInvalidItemCountStrategy)
 
     print("DF beginning")
     print(df.head())
@@ -112,10 +118,21 @@ if __name__ == "__main__":
     print("DF After partner ID row dropped")
     print(df.head())
 
-    ####################################################################
-    # Flag invalid rows in the CSV and log them                        #
-    ####################################################################
+    missing_part_number_row_dropper.drop_bad_rows(df, csv_error_logger)
 
-    # indices_with_invalid_count = df.loc[df["itemCount"] < 1].index
+    print("DF After missing part numbers dropped")
+    print(df.head())
 
-    # log_bulk_indices(indices_with_invalid_count, "Row skipped due to invalid item count: ")
+    bad_item_count_dropper.drop_bad_rows(df, csv_error_logger)
+
+    print("DF After bad item counts dropped")
+    print(df.head())
+
+    part_num_transformer = ColumnPrepper(PrepColumnMapPartNumberStrategy)
+    part_num_transformer.prep_column(df, type_map)
+    df = df.rename(columns={'PartNumber': 'PartNumber_mapped'})
+
+    print("DF After Part number mapped")
+    print(df.head())
+
+
