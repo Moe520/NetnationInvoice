@@ -5,5 +5,5 @@ class DropRowsStrategy(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def drop_bad_rows(self, data_ref):
+    def drop_bad_rows(self, data_ref, error_logger):
         """ Drop rows from the dataframe using the provided strategy"""
