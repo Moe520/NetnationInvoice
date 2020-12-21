@@ -50,7 +50,7 @@ if __name__ == "__main__":
         csv_error_logger.clear_log_file()
 
     if CLEAR_OLD_OUTPUTS_ON_STARTUP:  # If on remove outputs of previous run (otherwise will append)
-        remove_old_outputs("sample_outputs/domains_sql_insert.txt", "sample_outputs/chargeable_sql_insert.txt")
+        remove_old_outputs("domains_sql_insert.txt", "chargeable_sql_insert.txt")
 
     #######################################################################
     # Get the path to the csv (optionally: typemap and reduction map)     #
