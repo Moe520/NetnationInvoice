@@ -2,9 +2,11 @@
 
 
 ## Dependencies
-The following python packages are used for cleanly processing and transforming CSV files:
-pandas
-numpy
+The following python packages are used for cleanly processing and transforming CSV files:  
+
+pandas  
+numpy  
+
 
 Any modern python interpreter can be used (3.0 or higher)
 
