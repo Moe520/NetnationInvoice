@@ -178,8 +178,10 @@ if __name__ == "__main__":
     # Generate the sql inserts for domains table, then drop its data from memory    #
     #################################################################################
 
+    # Drop duplicate domains (keep the rows with the first occurences of each unique domain)
     df = df.drop_duplicates(subset='domains', keep='first')
 
+    # Generate sql inserts
     domains_sql_parameterizer = SqlParameterizer(ParameterizeSqlDomainsStrategy)
     domains_sql_parameterizer.parameterize_df_to_sql(df)
 
