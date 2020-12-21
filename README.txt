@@ -1,5 +1,11 @@
-# Instructions
+# Dependencies
+The following python packages are used for cleanly processing and transforming CSV files:
+pandas
+numpy
 
+Any modern python interpreter can be used (3.0 or higher)
+
+# Instructions
 1. Clone the repo onto your machine  ( git clone https://github.com/Moe520/UsageTranslator.git )
 2. Put the CSV to be processed at the root of the package (same level as process_csv.py)
 3. Run: python process_csv.py --infile <csv file name>
