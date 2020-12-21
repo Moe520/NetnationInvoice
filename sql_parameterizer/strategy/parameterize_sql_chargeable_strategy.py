@@ -6,7 +6,7 @@ class ParameterizeSqlChargeableStrategy:
 
     @staticmethod
     def generate_query_string(partner_id, product, partner_purchased_plan_id, plan, usage):
-        template = "INSERT INTO chargeable VALUES ($partner_id, $product, $partner_purchased_plan_id,$plan, $usage)"
+        template = "($partner_id, $product, $partner_purchased_plan_id,$plan, $usage),"
 
         result = Template(template).substitute(
             partner_id=partner_id,

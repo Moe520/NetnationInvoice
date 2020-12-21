@@ -1,9 +1,8 @@
 import pandas as pd
+import numpy as np
 from pandas.io.parsers import ParserError
 import json
 import os
-import argparse
-import logging
 
 from utils.input_validation_utils import get_terminal_args
 
@@ -19,6 +18,7 @@ from column_prepper.strategy.prep_column_apply_reduction_map_strategy import Pre
 
 from sql_parameterizer.sql_parameterizer import SqlParameterizer
 from sql_parameterizer.strategy.parameterize_sql_chargeable_strategy import ParameterizeSqlChargeableStrategy
+from sql_parameterizer.strategy.parameterize_sql_domains_strategy import ParameterizeSqlDomainsStrategy
 
 from error_logger.error_logger import ErrorLogger
 
@@ -28,26 +28,6 @@ REDUCTION_MAP_DEFAULT_PATH = os.path.dirname(os.path.abspath(__file__)) + "/maps
 
 CLEAR_LOGS_ON_STARTUP = True
 DEFAULT_ERROR_LOG_FILE_NAME = "csv_error_log.txt"
-
-'''
-invoice_column_map = {
-    "PartnerID": int,
-    "partnerGuid": str,
-    "accountid": str,
-    "accountGuid": str,
-    "username": str,
-    "domains": str,
-    "itemname": str,
-    "plan": str,
-    "itemType": str,
-    "PartNumber": str,
-    "itemCount": int
-}
-'''
-
-# def insert_statement_3_values(var1, var2, var3):
-#   return "INSERT INTO table VALUES (%s, %s, %s)", var1, var2, var3
-
 
 if __name__ == "__main__":
 
@@ -147,7 +127,7 @@ if __name__ == "__main__":
     print(df.head())
 
     account_guid_transformer = ColumnPrepper(PrepColumnRemoveHyphensStrategy)
-    account_guid_transformer.prep_column(df,type_map,reduction_map)
+    account_guid_transformer.prep_column(df, type_map, reduction_map)
 
     print("DF After non alphanumerics in account guid removed")
     print(df.head())
@@ -158,13 +138,31 @@ if __name__ == "__main__":
     print("DF After chargeables generated")
     print(df.head())
 
-    columns_to_drop = ["PartnerID", "PartNumber_mapped", "accountGuid", "plan", "itemCount"]
-    df.drop(columns_to_drop,axis=1,inplace=True)
+    df = df[["accountGuid", "domains", "chargeable_sql_insert"]]
+
+    with open("chargeable_sql_insert.txt", "a") as f:
+        f.write('INSERT INTO chargeable VALUES \n ')
+        np.savetxt(f, df["chargeable_sql_insert"].values, fmt="%s")
+
+    df.drop(columns=["chargeable_sql_insert"], inplace=True)
 
     print("DF After chargeable cols dropped")
     print(df.head())
 
+    df = df.drop_duplicates(subset='domains', keep='first')
 
+    domains_sql_parameterizer = SqlParameterizer(ParameterizeSqlDomainsStrategy)
+    domains_sql_parameterizer.parameterize_df_to_sql(df)
+
+    print("DF After domains duplicates dropped and inserts generated")
+    print(df.head())
+
+    with open("domains_sql_insert.txt", "a") as f:
+        f.write('INSERT INTO domains VALUES \n ')
+        np.savetxt(f, df["domains_sql_insert"].values, fmt="%s")
+
+    print("Pipeline complete")
+    exit(0)
 
 
 
