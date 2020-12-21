@@ -1,6 +1,6 @@
 from sql_parameterizer.strategy.abstract_parameterize_sql_strategy import ParameterizeSqlStrategy
 from string import Template
-
+import re
 
 class ParameterizeSqlChargeableStrategy:
 
