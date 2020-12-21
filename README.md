@@ -12,7 +12,7 @@ Any modern python interpreter can be used (3.0 or higher)
 
 ## Sample outputs
 
-If you want to see the results instead of running the program (or if the program fails due to unforseen circumstances), there is a copy of the outputs in the "Sample Outputs Folder".
+If you want to see the results without running the program (or if the program fails due to unforseen circumstances), there is a copy of the outputs in the "Sample Outputs Folder".
 
 
 ## Instructions
