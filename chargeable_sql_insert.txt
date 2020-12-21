@@ -1,5 +1,5 @@
 INSERT INTO chargeable VALUES 
- (26668, core.chargeable.exchange, ff633524c35f4de8acdaa7cdee38cd15,E2016_Exch_1_HOSTWAY, 2),
+(26668, core.chargeable.exchange, ff633524c35f4de8acdaa7cdee38cd15,E2016_Exch_1_HOSTWAY, 2),
 (26668, core.chargeable.advancemailsec, ff633524c35f4de8acdaa7cdee38cd15,E2016_Exch_1_HOSTWAY, 2),
 (26668, core.chargeable.owa, 6a1e663c829e4e79ac16fca89d61f143,E2016_Exch_1_HOSTWAY, 2),
 (26668, core.chargeable.advancemailsec, 6a1e663c829e4e79ac16fca89d61f143,E2016_Exch_1_HOSTWAY, 2),

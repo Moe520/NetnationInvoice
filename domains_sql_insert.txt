@@ -1,5 +1,5 @@
 INSERT INTO domains VALUES 
- (ff633524c35f4de8acdaa7cdee38cd15,dattilo526349-4.serverdata.net),
+(ff633524c35f4de8acdaa7cdee38cd15,dattilo526349-4.serverdata.net),
 (6a1e663c829e4e79ac16fca89d61f143,acct1292130-110.serverdata.net),
 (972080dc05794659bc22fd6c128b2371,acct1418626-224.serverdata.net),
 (7c29de4931de43d280d522d0dcd4913e,acct3281527-715.serverdata.net),

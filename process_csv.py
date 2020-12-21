@@ -108,22 +108,22 @@ if __name__ == "__main__":
     missing_part_number_row_dropper = SkippableRowDropper(DropRowsMissingPartNoStrategy)
     bad_item_count_dropper = SkippableRowDropper(DropRowsInvalidItemCountStrategy)
 
-    show_snapshot_if_debugging("DF beginning", DEBUG_MODE)
+    show_snapshot_if_debugging("DF beginning",df, DEBUG_MODE)
 
     # Drop Rows whose partner id is on the blacklist in the strategy file
     partner_id_row_dropper.drop_bad_rows(df, csv_error_logger)
 
-    show_snapshot_if_debugging("DF After partner ID row dropped", DEBUG_MODE)
+    show_snapshot_if_debugging("DF After partner ID row dropped",df,  DEBUG_MODE)
 
     # Drop rows with missing part numbers
     missing_part_number_row_dropper.drop_bad_rows(df, csv_error_logger)
 
-    show_snapshot_if_debugging("DF After missing part numbers dropped", DEBUG_MODE)
+    show_snapshot_if_debugging("DF After missing part numbers dropped",df,  DEBUG_MODE)
 
     # Drop rows with non positive item counts
     bad_item_count_dropper.drop_bad_rows(df, csv_error_logger)
 
-    show_snapshot_if_debugging("DF After bad item counts dropped", DEBUG_MODE)
+    show_snapshot_if_debugging("DF After bad item counts dropped",df,  DEBUG_MODE)
 
     ###############################################################################
     # Perform Transforms and mappings                                             #
@@ -138,13 +138,20 @@ if __name__ == "__main__":
     part_num_transformer.prep_column(df, type_map, reduction_map)
     df = df.rename(columns={'PartNumber': 'PartNumber_mapped'})
 
-    show_snapshot_if_debugging("DF After Part number mapped", DEBUG_MODE)
+    show_snapshot_if_debugging("DF After Part number mapped",df,  DEBUG_MODE)
 
     # Clean the accountGuid column
     account_guid_transformer = ColumnPrepper(PrepColumnRemoveHyphensStrategy)
     account_guid_transformer.prep_column(df, type_map, reduction_map)
 
-    show_snapshot_if_debugging("DF After non alphanumerics in account guid removed", DEBUG_MODE)
+    show_snapshot_if_debugging("DF After non alphanumerics in account guid removed",df,  DEBUG_MODE)
+
+    ###############################################################################
+    # Calculate Output totals                                                     #
+    ###############################################################################
+
+    product_summary = df.groupby(['PartNumber_mapped']).groups.keys()
+    print(product_summary)
 
     #################################################################################
     # Generate the sql inserts for chargeable table, then drop its data from memory #
@@ -154,7 +161,7 @@ if __name__ == "__main__":
     chargeable_sql_parameterizer = SqlParameterizer(ParameterizeSqlChargeableStrategy)
     chargeable_sql_parameterizer.parameterize_df_to_sql(df)
 
-    show_snapshot_if_debugging("DF After chargeables generated", DEBUG_MODE)
+    show_snapshot_if_debugging("DF After chargeables generated",df,  DEBUG_MODE)
 
     df = df[["accountGuid", "domains", "chargeable_sql_insert"]]
 
@@ -164,7 +171,7 @@ if __name__ == "__main__":
 
     df.drop(columns=["chargeable_sql_insert"], inplace=True)
 
-    show_snapshot_if_debugging("DF After chargeable cols dropped", DEBUG_MODE)
+    show_snapshot_if_debugging("DF After chargeable cols dropped",df,  DEBUG_MODE)
 
     #################################################################################
     # Generate the sql inserts for domains table, then drop its data from memory    #
@@ -175,7 +182,7 @@ if __name__ == "__main__":
     domains_sql_parameterizer = SqlParameterizer(ParameterizeSqlDomainsStrategy)
     domains_sql_parameterizer.parameterize_df_to_sql(df)
 
-    show_snapshot_if_debugging("DF After domains duplicates dropped and inserts generated", DEBUG_MODE)
+    show_snapshot_if_debugging("DF After domains duplicates dropped and inserts generated",df,  DEBUG_MODE)
 
     write_inserts_to_text_file("domains_sql_insert.txt", 'INSERT INTO domains VALUES', df["domains_sql_insert"].values)
 
