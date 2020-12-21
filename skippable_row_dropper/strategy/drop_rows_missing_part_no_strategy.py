@@ -1,8 +1,8 @@
-from skippable_row_dropper.strategy import abstract_drop_rows_strategy
+from skippable_row_dropper.strategy.abstract_drop_rows_strategy import DropRowsStrategy
 import pandas as pd
 
 
-class DropRowsMissingPartNoStrategy(abstract_drop_rows_strategy):
+class DropRowsMissingPartNoStrategy(DropRowsStrategy):
 
     def drop_bad_rows(self, data_ref, error_logger):
         indices_with_missing_part_no = data_ref.loc[pd.isna(data_ref['PartNumber'])].index

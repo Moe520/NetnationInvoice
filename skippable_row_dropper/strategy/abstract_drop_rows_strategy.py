@@ -6,4 +6,5 @@ class DropRowsStrategy(object):
 
     @abstractmethod
     def drop_bad_rows(self, data_ref, error_logger):
-        """ Drop rows from the dataframe using the provided strategy"""
+        """ Drop rows from the data frame using the provided strategy"""
+1

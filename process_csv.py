@@ -5,35 +5,20 @@ import os
 import argparse
 import logging
 
+from utils.input_validation_utils import get_terminal_args
+
+from skippable_row_dropper.skippable_row_dropper import SkippableRowDropper
+from skippable_row_dropper.strategy.drop_rows_missing_part_no_strategy import DropRowsMissingPartNoStrategy
+from skippable_row_dropper.strategy.drop_rows_by_partner_id_strategy import DropRowsByPartnerIdStrategy
+
+from error_logger.error_logger import ErrorLogger
+
 # Default file paths to use if none are given from command line
 TYPE_MAP_DEFAULT_PATH = os.path.dirname(os.path.abspath(__file__)) + "/maps/typemap.json"
 REDUCTION_MAP_DEFAULT_PATH = os.path.dirname(os.path.abspath(__file__)) + "/maps/reductionmap.json"
 
 CLEAR_LOGS_ON_STARTUP = True
 DEFAULT_ERROR_LOG_FILE_NAME = "csv_error_log.txt"
-
-
-class CsvLogger:
-    def __init__(self, log_file_path="csv_error_log.txt"):
-        self.log_file_path = log_file_path
-
-    def clear_log_file(self):
-        file_ref = open(self.log_file_path, "w")
-        file_ref.close()
-
-    def log_to_file(self, msg):
-        log_ref = open(self.log_file_path, "a")
-        log_ref.write(msg)
-        log_ref.close()
-
-
-class ConsoleLogger:
-    def __init__(self):
-        return
-
-    def log_to_stdout(self, msg):
-        print("WARNING: " + msg)
-
 
 '''
 invoice_column_map = {
@@ -51,47 +36,22 @@ invoice_column_map = {
 }
 '''
 
-
-def log_invalid_item_count_errors(rows):
-    return
-
-
-def insert_statement_3_values(var1, var2, var3):
-    return "INSERT INTO table VALUES (%s, %s, %s)", var1, var2, var3
+# def insert_statement_3_values(var1, var2, var3):
+#   return "INSERT INTO table VALUES (%s, %s, %s)", var1, var2, var3
 
 
 if __name__ == "__main__":
 
+    csv_error_logger = ErrorLogger(DEFAULT_ERROR_LOG_FILE_NAME)
+
+    if CLEAR_LOGS_ON_STARTUP:
+        csv_error_logger.clear_log_file()
+
     #######################################################################
     # Get the path to the csv (optionally: typemap and reduction map)     #
     #######################################################################
-    csv_logger = CsvLogger(DEFAULT_ERROR_LOG_FILE_NAME)
 
-    if CLEAR_LOGS_ON_STARTUP:
-        csv_logger.clear_log_file()
-
-    # Fetch the command line arguments
-    parser = argparse.ArgumentParser(description="""
-     This script will generate sql insert statements based on a given invoice csv 
-    """)
-
-    parser.add_argument("--infile", help="Path to the csv file to be processed",
-                        required=True
-                        )
-
-    parser.add_argument("--typemap",
-                        help="Optional Path to typemap.json file",
-                        required=False,
-                        default=TYPE_MAP_DEFAULT_PATH
-                        )
-
-    parser.add_argument("--reductionmap",
-                        help="Optional Path to typemap.json file",
-                        required=False,
-                        default=REDUCTION_MAP_DEFAULT_PATH
-                        )
-
-    args = parser.parse_args()
+    args = get_terminal_args(TYPE_MAP_DEFAULT_PATH, REDUCTION_MAP_DEFAULT_PATH)
 
     csv_file_path = args.infile
     type_map_path = args.typemap
@@ -110,58 +70,52 @@ if __name__ == "__main__":
             type_map = json.load(f)
     # Give error if file not found
     except FileNotFoundError:
-        logging.warning('ERROR: No json found at, ' + type_map_path)
+        csv_error_logger.warning('ERROR: No json found at, ' + type_map_path)
 
     ###################################################################
     # Load the reduction map json file                                #
     ###################################################################
-
     reduction_map = {}
-
     try:
         with open(reduction_map_path) as f:
             reduction_map = json.load(f)
-    # Give error if file not found
     except FileNotFoundError:
-        logging.warning('ERROR: No json found at, ', reduction_map_path)
+        csv_error_logger.warning('ERROR: No reduction map json found at, ', reduction_map_path)  # Warn if missing file
 
     ####################################################################
     # Import the CSV                                                   #
     ####################################################################
     # Try to import the CSV
     try:
-        df = pd.read_csv(
-            filepath_or_buffer=args.infile
-        )
+        df = pd.read_csv(filepath_or_buffer=args.infile)
 
     # Give error if file not found
     except FileNotFoundError:
-        logging.warning('ERROR: No CSV found at the specified path')
+        csv_error_logger.critical_error('ERROR: No CSV found at the specified path')
 
     # Give error if not valid csv
     except ParserError:
-        logging.warning(csv_file_path, 'Is not a valid csv file')
-
+        csv_error_logger.critical_error(csv_file_path, 'Is not a valid csv file')
 
     ####################################################################
     # Find invalid rows in the CSV and log them                        #
     ####################################################################
 
-    def log_bulk_indices(indices_list, pre_msg):
-        (pre_msg + pd.Series(indices_list.astype(str))).to_csv(DEFAULT_ERROR_LOG_FILE_NAME, mode="a", index=False,
-                                                               header=False)
+    partner_id_row_dropper = SkippableRowDropper(DropRowsByPartnerIdStrategy)
+    missing_part_number_row_dropper = SkippableRowDropper(DropRowsMissingPartNoStrategy)
 
+    print("DF beginning")
+    print(df.head())
 
-    indices_with_missing_part_no = df.loc[pd.isna(df['PartNumber'])].index
+    partner_id_row_dropper.drop_bad_rows(df, csv_error_logger)
 
-    missing_part_no_msg = "Row Skipped due to missing part number: "
-
-    log_bulk_indices(indices_with_missing_part_no, missing_part_no_msg)
+    print("DF After partner ID row dropped")
+    print(df.head())
 
     ####################################################################
     # Flag invalid rows in the CSV and log them                        #
     ####################################################################
 
-    indices_with_invalid_count = df.loc[df["itemCount"] < 1].index
+    # indices_with_invalid_count = df.loc[df["itemCount"] < 1].index
 
-    log_bulk_indices(indices_with_invalid_count, "Row skipped due to invalid item count: ")
+    # log_bulk_indices(indices_with_invalid_count, "Row skipped due to invalid item count: ")
