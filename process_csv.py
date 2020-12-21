@@ -15,6 +15,10 @@ from skippable_row_dropper.strategy.drop_rows_invalid_item_count_strategy import
 from column_prepper.column_prepper import ColumnPrepper
 from column_prepper.strategy.prep_column_remove_hyphen_strategy import PrepColumnRemoveHyphensStrategy
 from column_prepper.strategy.prep_column_map_part_number_strategy import PrepColumnMapPartNumberStrategy
+from column_prepper.strategy.prep_column_apply_reduction_map_strategy import PrepColumnApplyReductionMapStrategy
+
+from sql_parameterizer.sql_parameterizer import SqlParameterizer
+from sql_parameterizer.strategy.parameterize_sql_chargeable_strategy import ParameterizeSqlChargeableStrategy
 
 from error_logger.error_logger import ErrorLogger
 
@@ -128,12 +132,39 @@ if __name__ == "__main__":
     print("DF After bad item counts dropped")
     print(df.head())
 
+    unit_reduction_transformer = ColumnPrepper(PrepColumnApplyReductionMapStrategy)
+    unit_reduction_transformer.prep_column(df, type_map, reduction_map)
+
+    print("DF After Units Reduced")
+    print(df.head())
+    print(df[df["PartNumber"] == "PMQ00005GB0R"])
+
     part_num_transformer = ColumnPrepper(PrepColumnMapPartNumberStrategy)
-    part_num_transformer.prep_column(df, type_map,reduction_map)
+    part_num_transformer.prep_column(df, type_map, reduction_map)
     df = df.rename(columns={'PartNumber': 'PartNumber_mapped'})
 
     print("DF After Part number mapped")
     print(df.head())
 
+    account_guid_transformer = ColumnPrepper(PrepColumnRemoveHyphensStrategy)
+    account_guid_transformer.prep_column(df,type_map,reduction_map)
 
-    print(reduction_map)
+    print("DF After non alphanumerics in account guid removed")
+    print(df.head())
+
+    chargeable_sql_parameterizer = SqlParameterizer(ParameterizeSqlChargeableStrategy)
+    chargeable_sql_parameterizer.parameterize_df_to_sql(df)
+
+    print("DF After chargeables generated")
+    print(df.head())
+
+    columns_to_drop = ["PartnerID", "PartNumber_mapped", "accountGuid", "plan", "itemCount"]
+    df.drop(columns_to_drop,axis=1,inplace=True)
+
+    print("DF After chargeable cols dropped")
+    print(df.head())
+
+
+
+
+

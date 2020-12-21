@@ -6,7 +6,6 @@ class PrepColumnMapPartNumberStrategy(ColumnPrepStrategy):
 
     @staticmethod
     def get_part_name(part_number, type_map):
-        print("Part name func called with: " + part_number)
         if part_number in type_map:
             return type_map[part_number]
         else:
