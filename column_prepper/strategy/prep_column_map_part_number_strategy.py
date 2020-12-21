@@ -12,5 +12,5 @@ class PrepColumnMapPartNumberStrategy(ColumnPrepStrategy):
         else:
             return part_number
 
-    def prep_column(self, data_ref, type_map):
+    def prep_column(self, data_ref, type_map, reduction_map):
         data_ref["PartNumber"] = data_ref["PartNumber"].apply(lambda part_num: self.get_part_name(part_num, type_map))

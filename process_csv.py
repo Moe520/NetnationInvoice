@@ -129,10 +129,11 @@ if __name__ == "__main__":
     print(df.head())
 
     part_num_transformer = ColumnPrepper(PrepColumnMapPartNumberStrategy)
-    part_num_transformer.prep_column(df, type_map)
+    part_num_transformer.prep_column(df, type_map,reduction_map)
     df = df.rename(columns={'PartNumber': 'PartNumber_mapped'})
 
     print("DF After Part number mapped")
     print(df.head())
 
 
+    print(reduction_map)
