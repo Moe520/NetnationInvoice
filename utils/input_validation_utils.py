@@ -1,6 +1,12 @@
 import argparse
 
 def get_terminal_args(type_map_path,reduction_map_path):
+    """
+    Grabs the command line arguments
+    :param type_map_path: optional path to your own type maps.
+    :param reduction_map_path: optional path to your own reduction map
+    :return:
+    """
     # Fetch the command line arguments
     parser = argparse.ArgumentParser(description="""
      This script will generate sql insert statements based on a given invoice csv 
