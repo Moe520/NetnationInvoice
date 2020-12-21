@@ -1,4 +1,7 @@
 class SkippableRowDropper:
+    """
+    Drops rows from a dataframe based on a strategy
+    """
     def __init__(self, drop_rows_strategy):
         self.dropping_strategy = drop_rows_strategy
 
