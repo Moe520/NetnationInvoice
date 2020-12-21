@@ -40,7 +40,7 @@ CLEAR_OLD_OUTPUTS_ON_STARTUP = True
 DEFAULT_ERROR_LOG_FILE_NAME = "csv_error_log.txt"
 
 # If on, will see snapshots of the dataframe at each stage of the pipeline
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 if __name__ == "__main__":
 
@@ -147,10 +147,11 @@ if __name__ == "__main__":
     show_snapshot_if_debugging("DF After non alphanumerics in account guid removed",df,  DEBUG_MODE)
 
     ###############################################################################
-    # Calculate Output totals                                                     #
+    # Calculate Summary totals                                                     #
     ###############################################################################
 
-    product_summary = df.groupby(['PartNumber_mapped']).groups.keys()
+    product_summary = df[["PartNumber_mapped", "itemCount"]].groupby(['PartNumber_mapped']).sum()
+    product_summary = product_summary.rename(columns={"itemCount":"Sum(itemCount)"})
     print(product_summary)
 
     #################################################################################

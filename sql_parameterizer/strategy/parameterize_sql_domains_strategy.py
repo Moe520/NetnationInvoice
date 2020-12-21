@@ -16,9 +16,6 @@ class ParameterizeSqlDomainsStrategy:
         return result
 
     def parameterize_df_to_sql(self, data_ref):
-        print("Recieved DF")
-        print(data_ref.head())
-        print(data_ref.columns)
 
         data_ref["domains_sql_insert"] = data_ref.apply(lambda row: self.generate_query_string(
             row["accountGuid"], row["domains"]

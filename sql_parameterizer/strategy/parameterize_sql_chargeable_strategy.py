@@ -19,9 +19,6 @@ class ParameterizeSqlChargeableStrategy:
         return result
 
     def parameterize_df_to_sql(self, data_ref):
-        print("Recieved DF")
-        print(data_ref.head())
-        print(data_ref.columns)
 
         data_ref["chargeable_sql_insert"] = data_ref.apply(lambda row: self.generate_query_string(
             row["PartnerID"], row["PartNumber_mapped"], row["accountGuid"], row["plan"], row["itemCount"]
