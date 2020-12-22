@@ -1,8 +1,10 @@
 from sql_parameterizer.strategy.abstract_parameterize_sql_strategy import ParameterizeSqlStrategy
 from string import Template
-import re
+from utils.sql_string_sanitizer import sanitize_string
 
-class ParameterizeSqlChargeableStrategy:
+
+
+class ParameterizeSqlChargeableStrategy(ParameterizeSqlStrategy):
 
     @staticmethod
     def generate_query_string(partner_id, product, partner_purchased_plan_id, plan, usage):
@@ -19,7 +21,10 @@ class ParameterizeSqlChargeableStrategy:
         return result
 
     def parameterize_df_to_sql(self, data_ref):
-
         data_ref["chargeable_sql_insert"] = data_ref.apply(lambda row: self.generate_query_string(
-            row["PartnerID"], row["PartNumber_mapped"], row["accountGuid"], row["plan"], row["itemCount"]
+            int(sanitize_string(str(row["PartnerID"]))),
+            sanitize_string(row["PartNumber_mapped"]),
+            sanitize_string(row["accountGuid"]),
+            sanitize_string(row["plan"]),
+            int(sanitize_string(str(row["itemCount"]))),
         ), axis=1)
