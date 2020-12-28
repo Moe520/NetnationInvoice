@@ -32,6 +32,6 @@ If you want to see the results without running the program (or if the program fa
 
 ## Assumptions.
 
-The program expects your csv to be in the following format
+The program (for this example ) expects your csv to be in the following format
 
 PartnerID,partnerGuid,accountid,accountGuid,username,domains,itemname,plan,itemType,PartNumber,itemCount
