@@ -1,4 +1,4 @@
-# Template for using the strategy patten to implement a large scale ETL pipeline for transforming CSV's
+# Using the strategy patten to implement a large scale ETL pipeline for transforming CSV's
 
 This is my go-to design pattern for implementing CSV pipelines that need to have multiple customizable steps.
 I encapsulate each in-place operation with a "strategy" and group related strategies together by having an interface for each group.  
